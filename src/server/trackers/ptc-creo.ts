@@ -1,5 +1,5 @@
-import { load } from "cheerio";
 import { defineTracker, type ReleaseInfo } from "../tracker.ts";
+import { kbSections } from "./_sources/html.ts";
 
 /**
  * PTC Creo Parametric: Eine öffentliche, vollständige Release-Liste gibt es nicht (Product Calendar und
@@ -12,10 +12,8 @@ const SOURCE = "https://www.ptc.com/en/support/article/CS34553";
 
 /** Reine Parse-Funktion: je Hauptversion (Linie) die höchste genannte Version. */
 export function parseCreoKb(html: string): ReleaseInfo[] {
-  const $ = load(html);
-  const section = (heading: string) =>
-    $("h2").filter((_, h) => $(h).text().trim() === heading).first().parent().find("li").map((_, li) => $(li).text()).get();
-  const texts = [...section("Applies To"), ...section("Description")].filter((t) => /Creo(?! Elements)/.test(t));
+  const s = kbSections(html, ["Applies To", "Description"]);
+  const texts = [...(s["Applies To"] ?? []), ...(s["Description"] ?? [])].filter((t) => /Creo(?! Elements)/.test(t));
   if (!texts.length) throw new Error('Abschnitte "Applies To"/"Description" mit Creo nicht gefunden (Seitenlayout geändert?)');
 
   const best = new Map<number, [number, number]>();
