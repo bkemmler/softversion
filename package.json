@@ -11,8 +11,9 @@
     "dev": "node --watch --disable-warning=ExperimentalWarning src/server/main.ts & vite",
     "build": "vite build",
     "start": "node --disable-warning=ExperimentalWarning src/server/main.ts",
-    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.ts\"",
-    "lint": "tsc --noEmit"
+    "test": "node --disable-warning=ExperimentalWarning --import ./test/setup.ts --test \"test/**/*.test.ts\"",
+    "lint": "tsc --noEmit",
+    "check": "node --disable-warning=ExperimentalWarning src/server/cli.ts"
   },
   "dependencies": {
     "croner": "^11.0.0",

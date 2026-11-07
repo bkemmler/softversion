@@ -5,7 +5,7 @@ import { join } from "node:path";
 const LEVELS = { debug: 10, info: 20, warn: 30, error: 40 } as const;
 export type Level = keyof typeof LEVELS;
 
-const minLevel = LEVELS[(process.env.LOG_LEVEL as Level) ?? "info"] ?? LEVELS.info;
+
 let logDir: string | undefined;
 
 export function initLogFiles(dataDir: string, keepDays = 14) {
@@ -19,7 +19,7 @@ export function initLogFiles(dataDir: string, keepDays = 14) {
 }
 
 export function writeLog(level: Level, msg: string, fields: Record<string, unknown> = {}) {
-  if (LEVELS[level] < minLevel) return;
+  if (LEVELS[level] < (LEVELS[process.env.LOG_LEVEL as Level] ?? LEVELS.info)) return;
   const time = new Date().toISOString();
   const line = JSON.stringify({ time, level, msg, ...fields }) + "\n";
   (level === "error" ? process.stderr : process.stdout).write(line);
