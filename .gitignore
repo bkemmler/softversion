@@ -16,3 +16,5 @@ data/
 /.zprofile
 /.zshrc
 /.claude/settings.local.json
+/.claude/*
+!/.claude/skills/
