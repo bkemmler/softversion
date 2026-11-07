@@ -16,6 +16,7 @@
     "check": "node --disable-warning=ExperimentalWarning src/server/cli.ts"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "croner": "^11.0.0",
     "zod": "^4.6.7"
   },
