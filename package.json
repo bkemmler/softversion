@@ -1,6 +1,6 @@
 {
   "name": "softversion",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Software-Update-Tracker: prüft täglich Herstellerseiten auf neue Releases und meldet sie in Teams.",
@@ -13,7 +13,8 @@
     "start": "node --disable-warning=ExperimentalWarning src/server/main.ts",
     "test": "node --disable-warning=ExperimentalWarning --import ./test/setup.ts --test \"test/**/*.test.ts\"",
     "lint": "tsc --noEmit",
-    "check": "node --disable-warning=ExperimentalWarning src/server/cli.ts"
+    "check": "node --disable-warning=ExperimentalWarning src/server/cli.ts",
+    "new-tracker": "node --disable-warning=ExperimentalWarning scripts/new-tracker.ts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

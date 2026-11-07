@@ -1,9 +1,10 @@
 import { Fragment, useMemo, useState } from "react";
-import type { Product } from "../../shared/api.ts";
+import type { Channel, Product } from "../../shared/api.ts";
 import { api, fmtDate, STATUS_LABELS, useLoad } from "../api.ts";
 
 export function Products() {
   const { data, error, reload } = useLoad(() => api<Product[]>("/products"));
+  const channels = useLoad(() => api<Channel[]>("/channels"));
   const [q, setQ] = useState("");
   const [vendor, setVendor] = useState("");
   const [status, setStatus] = useState("");
@@ -56,7 +57,7 @@ export function Products() {
                 <td>{p.latestVersion ?? "–"}</td>
                 <td><button disabled={p.status === "missing"} onClick={() => act(api("/check", "POST", { trackerId: p.trackerId }), `Prüfung von ${p.product} gestartet.`).then(() => setTimeout(reload, 3000))}>Jetzt prüfen</button></td>
               </tr>
-              {open === p.id && <tr className="details"><td colSpan={7}><ProductDetails p={p} act={act} /></td></tr>}
+              {open === p.id && <tr className="details"><td colSpan={7}><ProductDetails p={p} act={act} channels={channels.data ?? []} /></td></tr>}
             </Fragment>
           ))}
         </tbody>
@@ -66,7 +67,9 @@ export function Products() {
   );
 }
 
-function ProductDetails({ p, act }: { p: Product; act: (x: Promise<unknown>, ok?: string) => void }) {
+function ProductDetails({ p, act, channels }: { p: Product; act: (x: Promise<unknown>, ok?: string) => void; channels: Channel[] }) {
+  const toggleChannel = (id: number, on: boolean) =>
+    act(api(`/products/${p.id}/channels`, "PUT", { channelIds: on ? [...p.channelIds, id] : p.channelIds.filter((c) => c !== id) }));
   return (
     <div>
       {p.lastError && <p className="error">Letzter Fehler ({p.consecutiveFailures}× in Folge): {p.lastError}</p>}
@@ -83,6 +86,15 @@ function ProductDetails({ p, act }: { p: Product; act: (x: Promise<unknown>, ok?
             </tr>
           ))}</tbody></table>
       ) : <p>Noch keine Linien – erscheinen nach der ersten Prüfung.</p>}
+      {channels.length > 1 && (
+        <>
+          <h3>Teams-Kanäle</h3>
+          <p className="muted">Ohne Auswahl gehen Meldungen an alle aktiven Kanäle.</p>
+          <div className="toolbar">{channels.map((c) => (
+            <label key={c.id}><input type="checkbox" checked={p.channelIds.includes(c.id)} onChange={(e) => toggleChannel(c.id, e.target.checked)} /> {c.name}{!c.enabled && " (inaktiv)"}</label>
+          ))}</div>
+        </>
+      )}
       <p className="muted">Tracker-ID: <code>{p.trackerId}</code> · Quellen: {p.sources.map((s) => <a key={s} href={s} target="_blank" rel="noreferrer">{s}</a>)}</p>
     </div>
   );

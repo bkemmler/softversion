@@ -116,3 +116,19 @@ test("API: Kanal anlegen nur mit https, URL wird maskiert ausgegeben", async (t)
   const list = await (await fetch(`${app.url}/api/channels`)).text();
   assert.ok(!list.includes("geheim"));
 });
+
+test("Produkt mit Kanal-Zuordnung meldet nur an diese Kanäle", async (t) => {
+  const a = await mockTeams(t);
+  const b = await mockTeams(t);
+  let list = [{ line: "1", version: "1.0", type: "major", sortKey: [1, 0] }];
+  const { db, runner, notifier, addChannel } = setup(() => list);
+  const chA = addChannel(a.url);
+  await notifier.sendTest(chA);
+  await notifier.sendTest(addChannel(b.url));
+  db.prepare("INSERT INTO product_channels (product_id, channel_id) SELECT id, ? FROM products").run(chA);
+  await runner.start("cli").done;
+  list = [...list, { line: "1", version: "1.1", type: "servicepack", sortKey: [1, 1] }];
+  await runner.start("cli").done;
+  assert.equal(a.posts.length, 2);
+  assert.equal(b.posts.length, 1, "nur die Testnachricht");
+});

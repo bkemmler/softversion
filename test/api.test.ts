@@ -44,3 +44,12 @@ test("Abnahme Stage 3: Produkt, Linie und Einstellungen über die API schaltbar 
   assert.equal(health.scheduler, true);
   assert.ok(health.nextRun);
 });
+
+test("API: Produkt einzelnen Kanälen zuordnen", async (t) => {
+  const a = await startApp(t, env);
+  const [p] = (await call(`${a.url}/api/products`)).body;
+  const ch = (await call(`${a.url}/api/channels`, "POST", { name: "CAD", webhookUrl: "https://example.logic.azure.com/x" })).body;
+  const res = await call(`${a.url}/api/products/${p.id}/channels`, "PUT", { channelIds: [ch.id, 999] });
+  assert.deepEqual(res.body.channelIds, [ch.id]);
+  assert.deepEqual((await call(`${a.url}/api/products/${p.id}/channels`, "PUT", { channelIds: [] })).body.channelIds, []);
+});
