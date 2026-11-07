@@ -3,7 +3,7 @@
 Ein Docker-Container prüft täglich für 20 bis 100 Softwareprodukte, ob es für getrackte Versionslinien neue Releases,
 Service Packs oder Hotfixes gibt, speichert sie in SQLite und postet sie per Workflow-Webhook in Teams.
 Je Produkt gibt es ein Tracker-Modul (Code); alles andere wird in der Web-UI bedient.
-Fachliches Konzept und Entscheidungen: `docs/konzept.md` (Abweichungen stehen in `docs/abweichungen.md`).
+Fachliches Konzept: `docs/konzept.md`, Abweichungen davon: `docs/abweichungen.md`, Tracker-Quellen: `docs/quellen.md`.
 
 ## Befehle
 
